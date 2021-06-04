@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spotify Image Search</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <form>
+      <label>
+        <input type="text" />
+      </label>
+    </form>
+
+    <main></main>
+
+
+    <footer>
+        <div>created by <a href="https://github.com/thorcc">thorcc</a></div>
+    </footer>
+    <script>
+      const input = document.querySelector("input");
+      const form = document.querySelector("form");
+      const img = document.querySelector("img");
+      const main = document.querySelector("main");
+
+      const getRandomArtist = async () => {
+        const res = await fetch(`/new`);
+        const data = await res.json();
+        const randomIndex = Math.floor(Math.random() * data.length);
+        return data[randomIndex].artist;
+      };
+
+
+      const getSearchResults = async (keyword, type) => {     
+        const res = await fetch(`/search/${type}/${keyword}`);
+        const data = await res.json();
+        console.log(data);
+        return data;
+      };
+
+      const search = async (artist) => {
+        main.innerHTML = `Loading..`;
+        const result = await getSearchResults(artist, "artist");
+        input.value = "";
+        input.placeholder = result[0].name;
+        main.innerHTML = `<img src=${result[0].image} alt=${result[0].name}>`;
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        if(input.value !== ""){
+            search(input.value);
+        }
+      });
+
+      const init = async () => {
+        input.focus();
+        let randomArtist = await getRandomArtist();
+        search(randomArtist);
+      }
+
+      init();
+    </script>
+  </body>
+</html>
